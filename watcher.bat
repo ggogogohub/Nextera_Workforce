@@ -1,6 +1,6 @@
 @echo off
 setlocal
 :loop
-timeout /t 30 /nobreak >nul  ⬅ Fix timeout command
+timeout /t 30 >nul
 call git-push.bat
 goto loop
