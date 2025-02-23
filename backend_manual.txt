@@ -1,256 +1,219 @@
-NextEra Workforce Backend Development Manual
-Windows Edition - "From Zero to Hero"
-Version 1.0 - For Complete Beginners
+📌 FINAL LOCKED VERSION OF OUR WIREFRAME
+🚀 NextEra Workforce: The Complete Step-by-Step Blueprint for Development & Deployment
+This document serves as the final reference guide for our entire project from backend, frontend, AI integration, security, database setup, cloud deployment, and testing strategies.
+________________________________________
+📌 PART 1: CLOUD SETUP (STEP-BY-STEP)
+📍 Step 1: Set Up Cloud Infrastructure
+Before writing any code, we set up the cloud environment so everything integrates smoothly.
+🔹 Services We Will Use on Azure (Free Tier)
+Component	Azure Service Used	Reason for Choosing
+Backend API	Azure App Service (Free Tier)	Scalable API hosting with CI/CD support.
+AI Model Deployment	Azure Virtual Machine (750 Free Hours)	Runs AI models for job ranking & scheduling.
+Database	Azure Cosmos DB (MongoDB API, Free 25GB)	Stores job applications, employee data, payroll records.
+File Storage	Azure Blob Storage (Free 5GB)	Saves CVs, payslips, HR reports.
+Real-time Messaging	Azure Web PubSub (Free 20,000 messages/day)	Enables live notifications for HR, payroll, and job updates.
+________________________________________
+📍 Step 2: Create Azure Resources
+1️. Set Up Azure App Service for Backend API
+1.	Go to Azure Portal → App Services → Create New App Service.
+2.	Select Python (FastAPI) as Runtime.
+3.	Enable Continuous Deployment (CI/CD) from GitHub.
+4.	Generate an API URL (e.g., https://nextera-backend.azurewebsites.net).
+2️. Deploy MongoDB Atlas (Azure Cosmos DB)
+1.	Go to Azure Portal → Cosmos DB → Create a New Database.
+2.	Select MongoDB API → Name it nextgen-workforce-db.
+3.	Use Free Tier (25GB of Storage, 400 RU/s Throughput).
+4.	Create a Connection String for Backend API.
+3️. Configure Azure Virtual Machine for AI Model
+1.	Go to Azure Portal → Virtual Machines → Create Linux VM.
+2.	Choose B1s (750 Free Hours) for AI Model Processing.
+3.	Install Python & Required Packages (pip install fastapi, scikit-learn).
+4.	Expose AI Model API (e.g., https://nextera-ai.azurewebsites.net).
+4️. Enable Azure Blob Storage for CV & Payroll Storage
+1.	Go to Azure Portal → Storage Accounts → Create New Storage.
+2.	Select Blob Storage → Enable 5GB Free Tier.
+3.	Configure Public & Secure Access.
 
-Chapter 1: Setting Up Your Battle Station
-1.1 Install Python 3.11
 
-Download from python.org/downloads
-
-Run installer
-
-CRUCIAL: Check "Add Python to PATH" at bottom
-
-Click "Install Now"
-
-1.2 Install Required Software
-
-Open Command Prompt (Search → cmd → Enter)
-
-Run these commands:
-
-text
-winget install Git.Git
-winget install Docker.DockerDesktop
-1.3 Prepare Your Workspace
-
-text
-mkdir nextgen-backend
-cd nextgen-backend
+📌 PART 2: BACKEND DEVELOPMENT (STEP-BY-STEP)
+📍 Step 1: Set Up the Development Environment
+Before coding, we set up our development environment for a smooth workflow.
+🔹 Tools & Technologies Required:
+•	Python (FastAPI framework for backend API development)
+•	MongoDB Atlas (Cloud NoSQL database for storing workforce data)
+•	AI & ML (Google OR-Tools for scheduling, Random Forest for CV Ranking)
+•	WebSockets (For real-time communication in messaging & shift notifications)
+•	Docker (To containerize the backend for easy deployment)
+•	Celery (For background processing tasks, like payroll calculations)
+🔹 Installation Commands:
+1️. Create a Virtual Environment
+bash
+CopyEdit
 python -m venv nextgen-env
+2️. Activate the Virtual Environment
+•	For Mac/Linux
+bash
+CopyEdit
+source nextgen-env/bin/activate
+•	For Windows
+bash
+CopyEdit
 nextgen-env\Scripts\activate
-You'll see (nextgen-env) in prompt when activated
-
-Chapter 2: Project Setup for Dummies
-2.1 Create Folder Structure
-Right-click → New Folder for each:
-
-text
-nextgen-backend
-├── app
-│   ├── core
-│   ├── models
-│   ├── routes
-│   ├── services
-├── tests
-2.2 Install Dependencies
-In activated virtual environment:
-
-text
-pip install fastapi uvicorn[standard] python-dotenv motor pymongo passlib python-jose[cryptography] pytest
-Chapter 3: Configuration Made Simple
-3.1 Create .env File
-
-Right-click → New → Text Document
-
-Name it .env
-
-Add:
-
-text
-MONGODB_URL=mongodb+srv://<username>:<password>@cluster0.mongodb.net/nextgen
-SECRET_KEY=your-super-secret-key-123
-3.2 Create config.py
-In app/core/config.py:
-
+3️. Install Required Packages
+bash
+CopyEdit
+pip install fastapi uvicorn pymongo motor passlib bcrypt python-jose python-multipart dotenv google-or-tools aioredis celery
+________________________________________
+📍 Step 2: Project Structure Setup
+We organize the backend into folders for easy scalability & maintainability.
+📂 Project Structure
+bash
+CopyEdit
+📂 nextgen-backend
+│── 📂 app
+│   │── 📂 core
+│   │   │── config.py  # Environment Variables & Configurations
+│   │── 📂 models
+│   │   │── user.py    # User Data Model
+│   │   │── job.py     # Job Posting Data Model
+│   │── 📂 routes
+│   │   │── auth.py    # User Authentication & Registration
+│   │   │── jobs.py    # Job Posting & AI Resume Matching
+│   │   │── chat.py    # Real-Time Communication System
+│   │   │── payroll.py # Payroll Processing
+│   │── 📂 services
+│   │   │── ai_engine.py  # AI-Powered Resume Review & Scheduling
+│   │   │── payroll_calc.py  # Automated Tax & Payroll Calculations
+│   │── main.py  # Entry Point
+│── .env  # Environment Variables (SECRET KEYS)
+│── requirements.txt  # Package List
+│── Dockerfile  # Deployment Configuration
+________________________________________
+📍 Step 3: Implement Secure Authentication System (OAuth + JWT)
+🔹 Features:
+✅ Multi-Tenant Authentication → Allows multiple enterprises to register
+✅ Role-Based Access Control (RBAC) → Admin, HR, Employee, Job Seeker
+✅ Two-Factor Authentication (2FA) & Biometric Login Support
+🔹 API Routes in auth.py:
+•	/auth/register → New Enterprise or Employee Registration
+•	/auth/login → Secure Login
+•	/auth/profile → Get User Profile
+•	/auth/update-profile → Update Profile (with password validation)
+•	/auth/delete-profile → Delete Account
+________________________________________
+📍 Step 4: Implement AI-Powered Job Posting & Resume Matching
+🔹 Features:
+✅ Managers Can Post Job Openings
+✅ AI Reads & Scores Resumes Based on Skills & Experience
+✅ Auto-Suggests Best Candidates to Hiring Manager
+🔹 API Routes in jobs.py:
+•	/jobs/create → Post New Job
+•	/jobs/view → View Open Jobs
+•	/jobs/apply → Candidate Applies
+•	/jobs/review-resume → AI Scores Resume
+•	/jobs/hire → Manager Selects a Candidate
+🔹 AI Resume Screening Example (Basic Logic in ai_engine.py)
 python
-from pydantic import BaseSettings
+CopyEdit
+def extract_keywords():
+    """Returns a predefined list of keywords for resume scoring."""
+    return ["Python", "Machine Learning", "Leadership"]
 
-class Settings(BaseSettings):
-    MONGODB_URL: str
-    SECRET_KEY: str
-    ALGORITHM: str = "HS256"
-    
-    class Config:
-        env_file = ".env"
+def calculate_score(resume_text, keywords):
+    """Calculates the percentage match for a given resume."""
+    score = sum(1 for word in keywords if word in resume_text)
+    return (score / len(keywords)) * 100
 
-settings = Settings()
-Chapter 4: Database Connection
-4.1 MongoDB Setup
-
-Create free account at mongodb.com/atlas
-
-Create cluster → Database → Connect → Driver: Python → Copy connection string
-
-Paste in .env replacing <username> and <password>
-
-4.2 Database Initialization
-In app/main.py:
-
-python
-from fastapi import FastAPI
-from motor.motor_asyncio import AsyncIOMotorClient
-
-app = FastAPI()
-
-@app.on_event("startup")
-async def connect_db():
-    app.mongodb_client = AsyncIOMotorClient(settings.MONGODB_URL)
-    app.db = app.mongodb_client["nextgen_db"]
-
-@app.on_event("shutdown")
-async def close_db():
-    app.mongodb_client.close()
-Chapter 5: User Authentication
-5.1 Create User Model
-In app/models/user.py:
-
-python
-from pydantic import BaseModel
-
-class User(BaseModel):
-    email: str
-    hashed_password: str
-    role: str = "employee"
-    disabled: bool = False
-5.2 Auth Routes
-In app/routes/auth.py:
-
-python
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
-
-router = APIRouter()
-
-@router.post("/register")
-async def register(user_data: dict):
-    # Registration logic here
-    return {"message": "User created"}
-
-@router.post("/login")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    # Login logic here
-    return {"access_token": "fake-token"}
-Chapter 6: Core Features Implementation
-6.1 AI Scheduling Setup
-
-text
-pip install ortools
-6.2 Basic Scheduler
-In app/services/scheduler.py:
-
-python
-from ortools.sat.python import cp_model
-
-def create_schedule(employees, shifts):
-    model = cp_model.CpModel()
-    # Add your constraints here
-    solver = cp_model.CpSolver()
-    status = solver.Solve(model)
-    return solver
-Chapter 7: Error Handling for Mortals
-7.1 Custom Error Class
-In app/core/errors.py:
-
-python
-class NextgenError(Exception):
-    def __init__(self, message: str):
-        self.message = message
-
-class ScheduleConflictError(NextgenError):
-    def __init__(self):
-        super().__init__("Shift conflict detected")
-7.2 Error Handler
-In app/main.py:
-
-python
-from fastapi.responses import JSONResponse
-
-@app.exception_handler(NextgenError)
-async def handle_errors(request, exc):
-    return JSONResponse(
-        status_code=400,
-        content={"message": exc.message}
-    )
-Chapter 8: Testing Your Creation
-8.1 Create Test File
-In tests/test_auth.py:
-
-python
-from fastapi.testclient import TestClient
-from app.main import app
-
-client = TestClient(app)
-
-def test_register():
-    response = client.post("/auth/register", json={
-        "email": "test@example.com",
-        "password": "secret123"
-    })
-    assert response.status_code == 200
-8.2 Run Tests
-
-text
-pytest tests/
-Chapter 9: Deployment to Cloud
-9.1 Docker Setup
-Create Dockerfile:
-
-text
-FROM python:3.11
+def score_resume(resume_text):
+    """Main function to score a resume."""
+    keywords = extract_keywords()
+    return calculate_score(resume_text, keywords)________________________________________
+📍 Step 5: Implement AI-Powered Employee Scheduling
+🔹 Features:
+✅ Automated Shift Assignments Using Google OR-Tools
+✅ Smart Conflict Resolution (Avoids Overlapping Shifts)
+✅ Real-Time Shift Swap Requests & Manager Approvals
+🔹 API Routes in scheduling.py:
+•	/schedule/generate → AI Generates Optimized Schedules
+•	/schedule/view → Employees View Their Shifts
+•	/schedule/swap → Employees Request Shift Swaps
+________________________________________
+📍 Step 6: Real-Time Communication System
+🔹 Features:
+✅ WhatsApp-Like Group & Private Messaging System
+✅ Managers Can Create & Manage Work Groups
+✅ WebSocket API for Instant Messaging
+🔹 API Routes in chat.py:
+•	/chat/send-message → Send Message
+•	/chat/fetch-messages → Fetch Previous Messages
+•	/chat/create-group → Managers Create Chat Groups
+________________________________________
+📍 Step 7: Automated Payroll Processing
+🔹 Features:
+✅ Integrated Payroll System (Direct Deposits, Payslips)
+✅ Automated Tax Compliance (Multi-Country Support)
+✅ Expense Reimbursements & Bonus Management
+🔹 API Routes in payroll.py:
+•	/payroll/calculate → Auto-Calculates Salary & Deductions
+•	/payroll/generate-payslip → Generates Payslip for Employees
+•	/payroll/deposit-salary → Sends Payment to Employee
+________________________________________
+📌 PART 3: FRONTEND DEVELOPMENT
+📍 Step 1: Project Setup
+1️. Initialize React App with TypeScript
+bash
+CopyEdit
+npx create-react-app nextgen-frontend --template typescript
+cd nextgen-frontend
+npm install axios react-router-dom redux-toolkit @mui/material socket.io-client
+2️. Frontend Folder Structure
+pgsql
+CopyEdit
+📂 nextgen-frontend
+│── 📂 src
+│   │── 📂 components
+│   │── 📂 pages
+│   │   │── Login.tsx
+│   │   │── Dashboard.tsx
+│   │   │── EmployeeDirectory.tsx
+│   │   │── Payroll.tsx
+│   │   │── Scheduling.tsx
+│   │   │── Chat.tsx
+│   │── 📂 redux
+│   │── App.tsx
+│   │── index.tsx
+│── .env
+________________________________________
+📌 PART 4: DEPLOYMENT & SCALABILITY
+📍 Step 1: Dockerize the Application
+Backend Dockerfile
+dockerfile
+CopyEdit
+FROM python:3.9
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
 COPY . .
+RUN pip install -r requirements.txt
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-9.2 Build & Run
-
-text
-docker build -t nextgen-backend .
-docker run -p 8000:8000 nextgen-backend
-Chapter 10: Maintenance & Safety
-10.1 Daily Check
-
-text
-python -m app.health_check
-10.2 Backup Database
-
-text
-mongodump --uri=%MONGODB_URL% --out=backups
-10.3 Update Dependencies
-
-text
-pip list --outdated
-pip install -U package-name
-Troubleshooting Guide
-
-Symptom	Solution
-ModuleNotFoundError	1. Check virtual env activated
-2. Run pip install again
-MongoDB Connection Fail	1. Check .env credentials
-2. Allow IP in Atlas network settings
-500 Internal Server Error	1. Check server logs
-2. Test individual endpoints
-Pro Tips for Beginners
-
-Use print() statements liberally for debugging
-
-Commit code after every working feature
-
-Test each endpoint with Postman before moving on
-
-Google error messages exactly as they appear
-
-Take breaks every 45 minutes
-
-Frontend Prep Checklist
-
-Create api_client folder
-
-Install Axios for API calls
-
-Set up JWT token storage
-
-Create error handling components
-
-This manual contains 127 specific steps to complete your backend. Remember: Even NASA's code had bugs. The key is persistence! 🚀
+Frontend Dockerfile
+dockerfile
+CopyEdit
+FROM node:16
+WORKDIR /app
+COPY . .
+RUN npm install
+CMD ["npm", "start"]
+________________________________________
+📌 PART 5: FINAL DEPLOYMENT
+✅ Backend → Azure App Service (Free Tier)
+✅ Frontend → Vercel (Free Forever)
+✅ Database → MongoDB Atlas (Azure Cosmos DB Free 25GB)
+✅ AI Model → Azure Virtual Machine (750 Free Hours)
+✅ File Storage → Azure Blob Storage (Free 5GB)
+________________________________________
+🎯 CONCLUSION: A Fully Functional & Scalable Workforce Management System
+🎯 AI-Powered Hiring & Resume Review
+🎯 Automated Shift Scheduling & Payroll Processing
+🎯 WhatsApp-Like Real-Time Communication for Enterprises
+🎯 Cloud-Deployed & Scalable for Global Market Expansion
+________________________________________
+🚀 This is the final reference guide for our project! Save it as the main wireframe. 🎯
