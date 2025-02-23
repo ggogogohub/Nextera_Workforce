@@ -4,35 +4,44 @@ This document serves as the final reference guide for our entire project from ba
 ________________________________________
 📌 PART 1: CLOUD SETUP (STEP-BY-STEP)
 📍 Step 1: Set Up Cloud Infrastructure
-Before writing any code, we set up the cloud environment so everything integrates smoothly.
-🔹 Services We Will Use on Azure (Free Tier)
-Component	Azure Service Used	Reason for Choosing
-Backend API	Azure App Service (Free Tier)	Scalable API hosting with CI/CD support.
-AI Model Deployment	Azure Virtual Machine (750 Free Hours)	Runs AI models for job ranking & scheduling.
-Database	Azure Cosmos DB (MongoDB API, Free 25GB)	Stores job applications, employee data, payroll records.
-File Storage	Azure Blob Storage (Free 5GB)	Saves CVs, payslips, HR reports.
-Real-time Messaging	Azure Web PubSub (Free 20,000 messages/day)	Enables live notifications for HR, payroll, and job updates.
+Before writing any code, we set up the cloud environment, so everything integrates smoothly.
+🔹 Services We Will Use on AWS (Free Tier) & Vercel (Frontend Hosting)
+Component	Cloud Service Used	Reason for Choosing
+Backend API	AWS Fargate (ECS - Free Tier: 750 Hours/Month)	Serverless containerized backend with auto-scaling.
+Frontend	Vercel (Free Forever)	Auto-deploy React frontend from GitHub, globally available, optimized for frontend hosting.
+Database	AWS DocumentDB (MongoDB API - Free Tier: 750 Hours/Month)	Managed MongoDB-compatible NoSQL database.
+File Storage	AWS S3 (Free Tier: 5GB Storage, 20K GET requests)	Stores CVs, payslips, HR reports.
+Real-time Messaging	AWS AppSync (Free Tier: 250K Queries, 600K Connection-Minutes/Month)	Enables WebSockets-based messaging and notifications.
+AI Model Deployment	AWS Lambda (Free Tier: 1M Requests, 400K GB-seconds Compute Time)	Runs AI models serverlessly for job ranking & scheduling.
 ________________________________________
-📍 Step 2: Create Azure Resources
-1️. Set Up Azure App Service for Backend API
-1.	Go to Azure Portal → App Services → Create New App Service.
-2.	Select Python (FastAPI) as Runtime.
-3.	Enable Continuous Deployment (CI/CD) from GitHub.
-4.	Generate an API URL (e.g., https://nextera-backend.azurewebsites.net).
-2️. Deploy MongoDB Atlas (Azure Cosmos DB)
-1.	Go to Azure Portal → Cosmos DB → Create a New Database.
-2.	Select MongoDB API → Name it nextgen-workforce-db.
-3.	Use Free Tier (25GB of Storage, 400 RU/s Throughput).
-4.	Create a Connection String for Backend API.
-3️. Configure Azure Virtual Machine for AI Model
-1.	Go to Azure Portal → Virtual Machines → Create Linux VM.
-2.	Choose B1s (750 Free Hours) for AI Model Processing.
-3.	Install Python & Required Packages (pip install fastapi, scikit-learn).
-4.	Expose AI Model API (e.g., https://nextera-ai.azurewebsites.net).
-4️. Enable Azure Blob Storage for CV & Payroll Storage
-1.	Go to Azure Portal → Storage Accounts → Create New Storage.
-2.	Select Blob Storage → Enable 5GB Free Tier.
-3.	Configure Public & Secure Access.
+📍 Step 2: Create AWS & Vercel Resources
+1️. Deploy FastAPI Backend on AWS Fargate
+1.	Go to AWS Console → ECS (Elastic Container Service) → Create Cluster.
+2.	Choose Fargate (Serverless Container Management).
+3.	Create Task Definition → Select Python (FastAPI) Docker Image.
+4.	Configure Auto-Scaling & Load Balancer.
+5.	Deploy and expose API URL (e.g., https://api.nextera.com) using AWS API Gateway.
+2️. Deploy MongoDB (AWS DocumentDB)
+1.	Go to AWS Console → DocumentDB → Create Cluster.
+2.	Select MongoDB Compatibility Mode.
+3.	Use 750 Free Hours/Month.
+4.	Copy Connection String and configure it in the backend API.
+3️. Deploy AI Model on AWS Lambda
+1.	Go to AWS Lambda → Create New Function.
+2.	Upload AI Model (Google OR-Tools, Resume Ranking Algorithm).
+3.	Deploy and expose API for backend integration.
+4️. Configure AWS S3 for File Storage
+1.	Go to AWS S3 → Create a New Bucket.
+2.	Configure Permissions for Secure & Public Access.
+3.	Integrate AWS S3 in the Backend API for CV Uploads.
+5️. Set Up AWS AppSync for Real-Time Messaging
+1.	Create AWS AppSync API (GraphQL WebSockets).
+2.	Set up Real-Time Chat & Notification System.
+3.	Integrate Backend Authentication with AppSync API.
+6️. Deploy Frontend (React) on Vercel
+1.	Go to Vercel → Create New Project.
+2.	Connect GitHub Repository → Enable Auto Deployment.
+3.	Frontend is now globally available!
 
 
 📌 PART 2: BACKEND DEVELOPMENT (STEP-BY-STEP)
@@ -204,12 +213,12 @@ RUN npm install
 CMD ["npm", "start"]
 ________________________________________
 📌 PART 5: FINAL DEPLOYMENT
-✅ Backend → Azure App Service (Free Tier)
+✅ Backend → AWS Fargate (ECS, Free Tier)
 ✅ Frontend → Vercel (Free Forever)
-✅ Database → MongoDB Atlas (Azure Cosmos DB Free 25GB)
-✅ AI Model → Azure Virtual Machine (750 Free Hours)
-✅ File Storage → Azure Blob Storage (Free 5GB)
-________________________________________
+✅ Database → AWS DocumentDB (Free Tier)
+✅ AI Model → AWS Lambda (Free Tier)
+✅ File Storage → AWS S3 (Free Tier)
+✅ Messaging → AWS AppSync (Free Tier)________________________________________
 🎯 CONCLUSION: A Fully Functional & Scalable Workforce Management System
 🎯 AI-Powered Hiring & Resume Review
 🎯 Automated Shift Scheduling & Payroll Processing
@@ -217,3 +226,4 @@ ________________________________________
 🎯 Cloud-Deployed & Scalable for Global Market Expansion
 ________________________________________
 🚀 This is the final reference guide for our project! Save it as the main wireframe. 🎯
+
